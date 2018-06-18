@@ -28,7 +28,8 @@ RUN apk --no-cache add --virtual build-dependencies gcc g++ musl-dev go \
     && apk del --purge -r build-dependencies \
     && rm -rf ~/go
 
-COPY --chown=jenkins docker-config.json /home/jenkins/.docker/config.json
+COPY docker-config.json /home/jenkins/.docker/config.json
+RUN chown -R jenkins /home/jenkins/.docker
 
 RUN groupadd -g ${DOCKER_GID} -r docker \
     && usermod -G docker jenkins
