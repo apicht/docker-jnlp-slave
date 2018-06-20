@@ -18,6 +18,7 @@ RUN apk --no-cache add \
         groff \
         less \
         mailcap \
+        jq \
         && \
     pip install --upgrade --no-cache-dir awscli s3cmd python-magic && \
     apk --purge del py-pip
