@@ -5,20 +5,29 @@ ARG DOCKER_GID=497
 USER root
 
 ENV DOCKER_VERSION "18.03.1-ce"
+
 RUN apk add --no-cache curl shadow \
     && curl -L -o /tmp/docker-$DOCKER_VERSION.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VERSION.tgz \
     && tar -xz -C /tmp -f /tmp/docker-$DOCKER_VERSION.tgz \
     && mv /tmp/docker/docker /usr/bin \
     && rm -rf /tmp/docker-$DOCKER_VERSION /tmp/docker \
-    && apk del curl
+    && apk del curl \
+    && git clone https://github.com/kamatama41/tfenv.git /home/jenkins/tfenv \
+    && ln -s /home/jenkins/tfenv/bin/* /usr/local/bin \
+    && chown -R jenkins:jenkins /home/jenkins/tfenv \
+    && git clone https://github.com/cunymatthieu/tgenv.git /home/jenkins/tgenv \
+    && ln -s /home/jenkins/tgenv/bin/* /usr/local/bin \
+    && chown -R jenkins:jenkins /home/jenkins/tgenv
 
 RUN apk --no-cache add \
         python \
+        python3 \
         py-pip \
         groff \
         less \
         mailcap \
         jq \
+        curl \
         && \
     pip install --upgrade --no-cache-dir awscli s3cmd python-magic && \
     apk --purge del py-pip
@@ -29,10 +38,16 @@ RUN apk --no-cache add --virtual build-dependencies gcc g++ musl-dev go \
     && apk del --purge -r build-dependencies \
     && rm -rf ~/go
 
-COPY docker-config.json /home/jenkins/.docker/config.json
-RUN chown -R jenkins /home/jenkins/.docker
-
 RUN groupadd -g ${DOCKER_GID} -r docker \
-    && usermod -G docker jenkins
+        && usermod -aG docker jenkins \
+        && usermod -aG users jenkins 
 
 USER jenkins
+
+RUN mkdir -p /home/jenkins/.ssh \
+    && tfenv install 0.11.7 \
+    && tfenv use 0.11.7 \
+    && tgenv install 0.13.24 \
+    && tgenv use 0.13.24
+
+ENTRYPOINT ["jenkins-slave"]
