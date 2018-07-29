@@ -14,10 +14,10 @@ RUN apk add --no-cache curl shadow \
     && apk del curl \
     && git clone https://github.com/kamatama41/tfenv.git /home/jenkins/tfenv \
     && ln -s /home/jenkins/tfenv/bin/* /usr/local/bin \
-    && chown -R jenkins:jenkins /home/jenkins/tfenv \
-    && git clone https://github.com/cunymatthieu/tgenv.git /home/jenkins/tgenv \
-    && ln -s /home/jenkins/tgenv/bin/* /usr/local/bin \
-    && chown -R jenkins:jenkins /home/jenkins/tgenv
+    && wget https://github.com/gruntwork-io/terragrunt/releases/download/v0.16.3/terragrunt_linux_amd64 \
+    && mv terragrunt_linux_amd64 /usr/local/bin/terragrunt \
+    && chmod +x /usr/local/bin/terragrunt \
+    && chown -R jenkins:jenkins /home/jenkins/tfenv
 
 RUN apk --no-cache add \
         python \
@@ -46,8 +46,6 @@ USER jenkins
 
 RUN mkdir -p /home/jenkins/.ssh \
     && tfenv install 0.11.7 \
-    && tfenv use 0.11.7 \
-    && tgenv install 0.13.24 \
-    && tgenv use 0.13.24
+    && tfenv use 0.11.7 
 
-ENTRYPOINT ["jenkins-slave"]
+#ENTRYPOINT ["jenkins-slave"]
