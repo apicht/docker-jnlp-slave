@@ -11,7 +11,6 @@ RUN apk add --no-cache curl shadow \
     && tar -xz -C /tmp -f /tmp/docker-$DOCKER_VERSION.tgz \
     && mv /tmp/docker/docker /usr/bin \
     && rm -rf /tmp/docker-$DOCKER_VERSION /tmp/docker \
-    && apk del curl \
     && git clone https://github.com/kamatama41/tfenv.git /home/jenkins/tfenv \
     && ln -s /home/jenkins/tfenv/bin/* /usr/local/bin \
     && wget https://github.com/gruntwork-io/terragrunt/releases/download/v0.16.3/terragrunt_linux_amd64 \
@@ -27,16 +26,9 @@ RUN apk --no-cache add \
         less \
         mailcap \
         jq \
-        curl \
         && \
     pip install --upgrade --no-cache-dir awscli s3cmd python-magic && \
     apk --purge del py-pip
-
-RUN apk --no-cache add --virtual build-dependencies gcc g++ musl-dev go \
-    && go get -u github.com/awslabs/amazon-ecr-credential-helper/ecr-login/cli/docker-credential-ecr-login \
-    && cp /home/jenkins/go/bin/docker-credential-ecr-login /usr/local/bin/docker-credential-ecr-login \
-    && apk del --purge -r build-dependencies \
-    && rm -rf ~/go
 
 RUN groupadd -g ${DOCKER_GID} -r docker \
         && usermod -aG docker jenkins \
