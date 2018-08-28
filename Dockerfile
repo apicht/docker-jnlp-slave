@@ -27,7 +27,7 @@ RUN apk --no-cache add \
         mailcap \
         jq \
         && \
-    pip install --upgrade --no-cache-dir awscli s3cmd python-magic && \
+    pip install --upgrade --no-cache-dir awscli s3cmd python-magic ssm-diff && \
     apk --purge del py-pip
 
 RUN groupadd -g ${DOCKER_GID} -r docker \
